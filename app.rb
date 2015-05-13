@@ -36,6 +36,7 @@ end
 
 post '/:person_id/edit' do |person_id|
   person = Person.find(person_id.to_i)
-  person.children.create(name: params.fetch("child_name"), gender: params.fetch("child_gender"))
+  child = Person.create(name: params.fetch("child_name"), gender: params.fetch("child_gender"))
+  child.update_relationship(person, params)
   redirect "/"
 end
