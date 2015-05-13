@@ -68,17 +68,24 @@ class Person < ActiveRecord::Base
 
     is_new_spouse = origin_parent.spouses.where(name: spouse_name, gender: spouse_gender).empty?
 
+    if is_new_spouse
+      spouse = origin_parent.spouses.create(name: spouse_name, gender: spouse_gender)
+    else
+      spouse = origin_parent.spouses.where(name: spouse_name, gender: spouse_gender).first
+    end
+
     if origin_parent.gender == "male"
       father_id = origin_parent.id
-
-      if is_new_spouse
-        spouse = origin_parent.spouses.create(name: spouse_name, gender: spouse_gender)
-        mother_id = spouse.id
-        Relationship.where(father_id: father_id, mother_id: mother_id, child_id: nil).first.update(child_id: id)
-      else
-        spouse = origin_parent.spouses.where(name: spouse_name, gender: spouse_gender).first
-        Relationship.create(child_id: id, father_id: father_id, mother_id: spouse.id )
-      end
+      spouse = fill_spouse(spouse_params, 'male')
+      #
+      # if is_new_spouse
+      #   spouse = origin_parent.spouses.create(name: spouse_name, gender: spouse_gender)
+      #   mother_id = spouse.id
+      #   Relationship.where(father_id: father_id, mother_id: mother_id, child_id: nil).first.update(child_id: id)
+      # else
+      #   spouse = origin_parent.spouses.where(name: spouse_name, gender: spouse_gender).first
+      #   Relationship.create(child_id: id, father_id: father_id, mother_id: spouse.id )
+      # end
 
     elsif origin_parent.gender == "female"
       mother_id = origin_parent.id
@@ -92,10 +99,9 @@ class Person < ActiveRecord::Base
       end
 
     end
-
-
   end
 
+  def fill_spouse
 private
   define_method(:capitalize_name) do
     name.capitalize!()
