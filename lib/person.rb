@@ -12,4 +12,31 @@ class Person < ActiveRecord::Base
   has_one :childs_dads, :foreign_key => :child_id, class_name: "Relationship"
   has_one :dad, through: :childs_dads, source: :dad
 
+  def has_children?
+    self.moms_children.any? || self.fathers_children.any?
+  end
+
+  def children
+    if gender == "male"
+      dads_children
+    elsif gender == "female"
+      moms_children
+    end
+  end
+
+  def build_tree
+    if has_children?
+      return_string = "<ul>"
+      return_string += name
+      children.each do |child|
+        return_string += "<li>" + child.build_tree + "</li>"
+      end
+      return_string += "</ul>"
+      return return_string
+    else
+      return name
+    end
+  end
+
+
 end
