@@ -63,37 +63,27 @@ class Person < ActiveRecord::Base
   def update_relationship(origin_parent, spouse_params)
     # only call on a child
 
-    spouse_name = spouse_params["spouse_name"]
+    spouse_name = spouse_params["spouse_name"].capitalize
     spouse_gender = spouse_params["spouse_gender"]
 
     is_new_spouse = origin_parent.spouses.where(name: spouse_name, gender: spouse_gender).empty?
 
-    if origin_parent.gender == "male"
-      father_id = origin_parent.id
+    if is_new_spouse
+      spouse = origin_parent.spouses.create(name: spouse_name, gender: spouse_gender)
 
-      if is_new_spouse
-        spouse = origin_parent.spouses.create(name: spouse_name, gender: spouse_gender)
-        mother_id = spouse.id
-        Relationship.where(father_id: father_id, mother_id: mother_id, child_id: nil).first.update(child_id: id)
-      else
-        spouse = origin_parent.spouses.where(name: spouse_name, gender: spouse_gender).first
-        Relationship.create(child_id: id, father_id: father_id, mother_id: spouse.id )
-      end
-
-    elsif origin_parent.gender == "female"
-      mother_id = origin_parent.id
-      if is_new_spouse
-        spouse = origin_parent.spouses.create(name: spouse_name, gender: spouse_gender)
-        father_id = spouse.id
-        Relationship.where(father_id: father_id, mother_id: mother_id, child_id: nil).first.update(child_id: id)
-      else
-        spouse = origin_parent.spouses.where(name: spouse_name, gender: spouse_gender).first
-        Relationship.create(child_id: id, father_id: spouse.id, mother_id: mother_id )
-      end
-
+    else
+      spouse = origin_parent.spouses.where(name: spouse_name, gender: spouse_gender).first
     end
 
+    if origin_parent.gender == "male"
+      father_id = origin_parent.id
+      mother_id = spouse.id
+    elsif origin_parent.gender == "female"
+      father_id = spouse.id
+      mother_id = origin_parent.id
+    end
 
+    Relationship.create(child_id: id, father_id: father_id, mother_id: mother_id)
   end
 
 private
