@@ -1,0 +1,11 @@
+<h2>Change <%=@person.name%> relationships</h2>
+
+<form action="/<%=@person.id%>/edit" method="post">
+  <label for="child_name">What is your child's name</label>
+  <input id="child_name" name="child_name" type="text">
+  <br>
+  <label for="child_gender">What is your child's gender</label>
+  <input id="child_gender" name="child_gender" type="text">
+  <br>
+  <button type="submit">Add Child</button>
+</form>

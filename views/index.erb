@@ -1,0 +1,9 @@
+<h1>Your Family Tree App</h1>
+
+<a href="/start_tree">Start family tree</a>
+
+<ul>
+<% @tree_starters.each do |person| %>
+  <li><a href="/viewtree/<%= person.id %>"><%= person.name %> </a></li>
+<% end %>
+</ul>

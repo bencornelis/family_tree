@@ -1,5 +1,8 @@
 require("bundler/setup")
 Bundler.require(:default)
+require('sinatra/reloader')
+
+also_reload('lib/**/*.rb')
 Dir[File.dirname(__FILE__) + '/lib/*.rb'].each { |file| require file }
 
 
@@ -24,4 +27,15 @@ end
 get '/viewtree/:id' do |id|
   @tree_starter = Person.find(id.to_i)
   erb :view_tree
+end
+
+get '/:id/edit' do |id|
+  @person = Person.find(id.to_i)
+  erb :person_edit
+end
+
+post '/:person_id/edit' do |person_id|
+  person = Person.find(person_id.to_i)
+  person.children.create(name: params.fetch("child_name"), gender: params.fetch("child_gender"))
+  redirect "/"
 end

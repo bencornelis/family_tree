@@ -26,15 +26,16 @@ class Person < ActiveRecord::Base
 
   def build_tree
     if has_children?
-      return_string = "<ul>"
-      return_string += name
+      return_string = ""
+      return_string += "<a href='/#{id}/edit'>#{name}</a>"
+      return_string += "<ul>"
       children.each do |child|
         return_string += "<li>" + child.build_tree + "</li>"
       end
       return_string += "</ul>"
       return return_string
     else
-      return name
+      return "<a href='/#{id}/edit'>#{name}</a>"
     end
   end
 
