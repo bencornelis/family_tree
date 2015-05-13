@@ -18,6 +18,9 @@ class Person < ActiveRecord::Base
   has_many :male_spouse, :foreign_key => :mother_id, class_name: "Relationship"
   has_many :husbands, -> { uniq }, through: :male_spouse, source: :husband
 
+  before_save(:capitalize_name)
+  validates(:name, :presence => true)
+
   def has_children?
     self.moms_children.any? || self.fathers_children.any?
   end
@@ -93,4 +96,8 @@ class Person < ActiveRecord::Base
 
   end
 
+private
+  define_method(:capitalize_name) do
+    name.capitalize!()
+  end
 end

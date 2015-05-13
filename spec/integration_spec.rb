@@ -10,7 +10,7 @@ describe('path to creating a family tree', {:type => :feature}) do
     visit('/')
     click_link('Start family tree')
     fill_in('name', :with => 'Bob')
-    fill_in('gender', :with => 'male')
+    choose('male')
     click_button('Start Tree')
     expect(page).to have_content('Bob')
   end
@@ -26,7 +26,7 @@ describe('adding a child to a person', {:type => :feature}) do
     choose('spouse_female')
     click_button('Add Child')
     click_link("#{bob.name}")
-    expect(page).to(have_content("john"))
-    expect(page).to(have_content("sally"))
+    expect(page).to(have_content("John"))
+    expect(page).to(have_content("Sally"))
   end
 end
