@@ -1,44 +1,29 @@
+require "pry"
 class Person < ActiveRecord::Base
 
-  has_many :mothers_children, :foreign_key => :mother_id, class_name: "Relationship"
-  has_many :moms_children, through: :mothers_children, source: :child
+  has_many :parent_relationships, foreign_key: :child_id,
+                                  class_name: "Relationship"
 
-  has_many :fathers_children, :foreign_key => :father_id, class_name: "Relationship"
-  has_many :dads_children, through: :fathers_children, source: :child
+  has_many :parents, through: :parent_relationships
 
-  has_one :childs_moms, :foreign_key => :child_id, class_name: "Relationship"
-  has_one :mom, through: :childs_moms, source: :mom
+  has_many :child_relationships, foreign_key: :parent_id,
+                                 class_name: "Relationship"
 
-  has_one :childs_dads, :foreign_key => :child_id, class_name: "Relationship"
-  has_one :dad, through: :childs_dads, source: :dad
-
-  has_many :female_spouses, :foreign_key => :father_id, class_name: "Relationship"
-  has_many :wives, -> { uniq }, through: :female_spouses, source: :wife
-
-  has_many :male_spouse, :foreign_key => :mother_id, class_name: "Relationship"
-  has_many :husbands, -> { uniq }, through: :male_spouse, source: :husband
+  has_many :children, through: :child_relationships
 
   before_save(:capitalize_name)
   validates(:name, :presence => true)
 
   def has_children?
-    self.moms_children.any? || self.fathers_children.any?
+    children.any?
   end
 
   def spouses
-    if gender == "male"
-      wives
-    else
-      husbands
+    spouses = []
+    children.each do |child|
+      spouses << child.parents.select { |parent| parent != self }.first
     end
-  end
-
-  def children
-    if gender == "male"
-      dads_children
-    elsif gender == "female"
-      moms_children
-    end
+    spouses.uniq
   end
 
   def build_tree
@@ -60,50 +45,8 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def update_relationship(origin_parent, spouse_params)
-    # only call on a child
-
-    spouse_name = spouse_params["spouse_name"]
-    spouse_gender = spouse_params["spouse_gender"]
-
-    is_new_spouse = origin_parent.spouses.where(name: spouse_name, gender: spouse_gender).empty?
-
-    if is_new_spouse
-      spouse = origin_parent.spouses.create(name: spouse_name, gender: spouse_gender)
-    else
-      spouse = origin_parent.spouses.where(name: spouse_name, gender: spouse_gender).first
-    end
-
-    if origin_parent.gender == "male"
-      father_id = origin_parent.id
-      spouse = fill_spouse(spouse_params, 'male')
-      #
-      # if is_new_spouse
-      #   spouse = origin_parent.spouses.create(name: spouse_name, gender: spouse_gender)
-      #   mother_id = spouse.id
-      #   Relationship.where(father_id: father_id, mother_id: mother_id, child_id: nil).first.update(child_id: id)
-      # else
-      #   spouse = origin_parent.spouses.where(name: spouse_name, gender: spouse_gender).first
-      #   Relationship.create(child_id: id, father_id: father_id, mother_id: spouse.id )
-      # end
-
-    elsif origin_parent.gender == "female"
-      mother_id = origin_parent.id
-      if is_new_spouse
-        spouse = origin_parent.spouses.create(name: spouse_name, gender: spouse_gender)
-        father_id = spouse.id
-        Relationship.where(father_id: father_id, mother_id: mother_id, child_id: nil).first.update(child_id: id)
-      else
-        spouse = origin_parent.spouses.where(name: spouse_name, gender: spouse_gender).first
-        Relationship.create(child_id: id, father_id: spouse.id, mother_id: mother_id )
-      end
-
-    end
-  end
-
-  def fill_spouse
 private
-  define_method(:capitalize_name) do
-    name.capitalize!()
+  def capitalize_name
+    name.capitalize!
   end
 end

@@ -1,19 +1,13 @@
-<h2>Change <%=@person.name%> relationships</h2>
-
-<form action="/<%=@person.id%>/edit" method="post">
-  <label for="child_name">What is your child's name</label>
-  <input id="child_name" name="child_name" type="text">
-  <br>
-  <label for="child_gender">What is your child's gender</label>
-  <input type="radio" id="child_male" name="child_gender" value="male"checked="checked"/><label for ="man">Male</label>
-  <input type="radio" id="child_female" name="child_gender" value="female"checked="unchecked"/><label for ="women">Female</label>
-  <br>
-  <label for="spouse_name">What is your spouse's name</label>
-  <input id="spouse_name" name="spouse_name" type="text">
-  <br>
-  <label for="spouse_gender">What is your spouse's gender</label>
-  <input type="radio" id="spouse_male" name="spouse_gender" value="male"checked="checked"/><label for ="man">Male</label>
-  <input type="radio" id="spouse_female" name="spouse_gender" value="female"checked="unchecked"/><label for ="women">Female</label>
-  <br>
-  <button type="submit">Add Child</button>
-</form>
+<div class="col-md-6">
+  <h2>Add to <%=@person.name%>'s relationships</h2>
+  <hr>
+  <form action="/<%=@person.id%>/edit" method="post">
+    <label for="child_name">Child's name</label>
+    <input class="form-control" id="child_name" name="child_name" type="text">
+    <br>
+    <label for="spouse_name">Spouse's name</label>
+    <input class="form-control" id="spouse_name" name="spouse_name" type="text">
+    <br>
+    <button type="submit" class="btn btn-default">Add relationship</button>
+  </form>
+</div>
